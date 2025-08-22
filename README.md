@@ -211,7 +211,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 📖 **Documentation**: See [COMPREHENSIVE_USAGE_GUIDE.md](COMPREHENSIVE_USAGE_GUIDE.md)
 - 🐛 **Issues**: Report bugs via GitHub Issues
 - 💬 **Discussions**: Join GitHub Discussions for questions
-- 📧 **Contact**: [Your Email] for collaboration inquiries
+- 📧 **Contact**: [Erfan.zohrabi@studio.unibo.it] for collaboration inquiries
 
 ## 🔄 Version History
 
