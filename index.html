@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 Protein Structure Analysis Platform</title>
+    
+    <!-- External Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/3dmol@latest/build/3Dmol-min.js"></script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Custom Styles for this page -->
+    <style>
+        /* Feature navigation styles */
+        .feature-nav { 
+            display: flex; 
+            gap: 10px; 
+            margin: 20px 0; 
+            flex-wrap: wrap;
+        }
+        
+        .feature-btn { 
+            padding: 10px 20px; 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .feature-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .feature-btn.active { 
+            background: #764ba2; 
+            box-shadow: 0 3px 10px rgba(118, 75, 162, 0.3);
+        }
+        
+        /* Section styles */
+        .content-section { 
+            display: none; 
+            padding: 20px 0; 
+        }
+        
+        .content-section.active { 
+            display: block; 
+        }
+        
+        /* CLI command styles */
+        .cli-command { 
+            background: #2d3748; 
+            color: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: 'Courier New', monospace; 
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            overflow-x: auto;
+        }
+        
+        .cli-command:hover {
+            background: #4a5568;
+            cursor: pointer;
+        }
+        
+        /* Search input improvements */
+        #proteinSearch {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        #proteinSearch:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        #searchBtn {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+            margin-left: 10px;
+        }
+        
+        #searchBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .feature-nav {
+                justify-content: center;
+            }
+            
+            .feature-btn {
+                flex: 1;
+                text-align: center;
+                min-width: 100px;
+            }
+            
+            .search-section {
+                margin: 10px 0;
+            }
+            
+            #proteinSearch {
+                margin-bottom: 10px;
+            }
+            
+            #searchBtn {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+        
+        /* Fallback: Show visualization section by default if JavaScript fails */
+        .no-js #visualization {
+            display: block !important;
+        }
+        
+        /* Emergency fallback - show all content if needed */
+        .emergency-show .content-section {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Loading Protein Structure...</h3>
+            <p>Please wait while we fetch and process the data</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span style="font-size: 2rem;">🧬</span>
+                    <h1>Protein Structure Viewer</h1>
+                </div>
+                
+                <div class="search-section">
+                    <div class="search-container">
+                        <input type="text" 
+                               id="proteinSearch" 
+                               placeholder="Enter UniProt ID (e.g., P01308) or protein name..."
+                               autocomplete="off">
+                        <button id="searchBtn">🔍 Search</button>
+                    </div>
+                </div>
+                
+                <div class="feature-nav">
+                    <button class="feature-btn active" onclick="showSection('visualization')">🔬 3D Viewer</button>
+                    <button class="feature-btn" onclick="showSection('cli')">💻 CLI</button>
+                    <button class="feature-btn" onclick="showSection('docs')">📚 Docs</button>
+                    <button class="feature-btn" onclick="showSection('help')">❓ Help</button>
+                    <button class="feature-btn" onclick="debugShowAll()" style="background: #ff6b6b;">🔧 Debug</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Error/Success Messages -->
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- Protein Information -->
+            <div class="protein-info glass" id="proteinInfo" style="display: none;">
+                <div class="protein-header">
+                    <div class="protein-title">
+                        <h2 id="proteinName">Protein Name</h2>
+                        <p id="proteinDescription">Protein description will appear here</p>
+                    </div>
+                </div>
+
+                <div class="protein-meta grid grid-auto gap-20">
+                    <div class="meta-item">
+                        <div class="meta-label">UniProt ID</div>
+                        <div class="meta-value" id="uniprotId">-</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Organism</div>
+                        <div class="meta-value" id="organism">-</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Length</div>
+                        <div class="meta-value" id="proteinLength">-</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Molecular Weight</div>
+                        <div class="meta-value" id="molecularWeight">-</div>
+                    </div>
+                </div>
+
+                <div class="function-section">
+                    <div class="function-title">🔬 Protein Function</div>
+                    <div id="proteinFunction">Function information will be displayed here...</div>
+                    
+                    <div class="function-title" style="margin-top: 20px;">🧬 Amino Acid Sequence</div>
+                    <div class="sequence-display" id="proteinSequence">Sequence will be displayed here...</div>
+                </div>
+            </div>
+
+            <!-- 3D Visualization Section -->
+            <div id="visualization" class="content-section active">
+                <h2 style="text-align: center; margin-bottom: 30px;">🧬 3D Structure Comparison</h2>
+                
+                <!-- 3D Viewers Container -->
+                <div class="viewers-container grid grid-2 gap-30" id="viewersContainer" style="display: none;">
+                    <!-- AlphaFold Viewer -->
+                    <div class="viewer-section glass">
+                        <div class="viewer-header flex-between">
+                            <h3 class="viewer-title alphafold-title">🔵 AlphaFold Structure</h3>
+                            <div class="viewer-controls">
+                                <button class="control-btn active" onclick="setStyle('alphafold', 'cartoon')">Cartoon</button>
+                                <button class="control-btn" onclick="setStyle('alphafold', 'surface')">Surface</button>
+                                <button class="control-btn" onclick="setStyle('alphafold', 'stick')">Sticks</button>
+                                <button class="control-btn" onclick="resetView('alphafold')">Reset</button>
+                            </div>
+                        </div>
+                        <div class="viewer" id="alphafoldViewer">
+                            <div class="viewer-loading">
+                                <div class="spinner"></div>
+                                <div>Loading AlphaFold structure...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ESMFold Viewer -->
+                    <div class="viewer-section glass">
+                        <div class="viewer-header flex-between">
+                            <h3 class="viewer-title esmfold-title">🔴 ESMFold Structure</h3>
+                            <div class="viewer-controls">
+                                <button class="control-btn active" onclick="setStyle('esmfold', 'cartoon')">Cartoon</button>
+                                <button class="control-btn" onclick="setStyle('esmfold', 'surface')">Surface</button>
+                                <button class="control-btn" onclick="setStyle('esmfold', 'stick')">Sticks</button>
+                                <button class="control-btn" onclick="resetView('esmfold')">Reset</button>
+                            </div>
+                        </div>
+                        <div class="viewer" id="esmfoldViewer">
+                            <div class="viewer-loading">
+                                <div class="spinner"></div>
+                                <div>Loading ESMFold structure...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Results -->
+                <div class="comparison-section glass" id="comparisonSection" style="display: none;">
+                    <h3 style="text-align: center; margin-bottom: 30px; font-size: 2rem;">📊 Structure Comparison</h3>
+                    
+                    <div class="rmsd-display">
+                        <div class="rmsd-value" id="rmsdValue">-</div>
+                        <div>RMSD (Å)</div>
+                        <div class="rmsd-interpretation" id="rmsdInterpretation">Run analysis to see results</div>
+                    </div>
+
+                    <div class="grid grid-2 gap-30" style="margin-top: 30px;">
+                        <div>
+                            <h4>🔵 AlphaFold Approach</h4>
+                            <ul>
+                                <li>Uses Multiple Sequence Alignments (MSAs)</li>
+                                <li>Template-based modeling</li>
+                                <li>Higher accuracy for well-studied proteins</li>
+                                <li>Computationally intensive</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>🔴 ESMFold Approach</h4>
+                            <ul>
+                                <li>Language model-based prediction</li>
+                                <li>Single sequence input</li>
+                                <li>Faster predictions</li>
+                                <li>Good for novel sequences</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLI Section -->
+            <div id="cli" class="content-section">
+                <h2>💻 Command Line Interface</h2>
+                <p style="margin-bottom: 20px;">Use these commands to analyze proteins from the terminal:</p>
+                
+                <div class="cli-command" onclick="copyCommand(this)">python protein_cli.py --help</div>
+                <div class="cli-command" onclick="copyCommand(this)">python protein_cli.py analyze P01308</div>
+                <div class="cli-command" onclick="copyCommand(this)">python protein_cli.py advanced P01308</div>
+                <div class="cli-command" onclick="copyCommand(this)">python protein_cli.py batch proteins.txt</div>
+                <div class="cli-command" onclick="copyCommand(this)">python protein_cli.py server --port 5001</div>
+                <div class="cli-command" onclick="copyCommand(this)">python protein_cli.py interactive</div>
+                
+                <h3 style="margin-top: 30px;">Available Commands:</h3>
+                <div class="grid grid-2 gap-20" style="margin-top: 15px;">
+                    <div>
+                        <ul>
+                            <li><strong>analyze</strong> - Single protein analysis</li>
+                            <li><strong>advanced</strong> - Advanced analysis with homology</li>
+                            <li><strong>batch</strong> - Process multiple proteins</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul>
+                            <li><strong>server</strong> - Launch web interface</li>
+                            <li><strong>interactive</strong> - Interactive mode</li>
+                            <li><strong>create-example</strong> - Generate example file</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentation Section -->
+            <div id="docs" class="content-section">
+                <h2>📚 Documentation</h2>
+                
+                <div class="grid grid-2 gap-30">
+                    <div>
+                        <h3>🧬 Example Proteins:</h3>
+                        <ul style="margin-top: 15px;">
+                            <li><strong>P01308</strong> - Human Insulin (Small hormone)</li>
+                            <li><strong>P61626</strong> - Lysozyme (Antimicrobial enzyme)</li>
+                            <li><strong>P68871</strong> - Hemoglobin β (Transport protein)</li>
+                            <li><strong>P02768</strong> - Serum Albumin (Large plasma protein)</li>
+                            <li><strong>P04637</strong> - p53 Tumor Suppressor (DNA binding)</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3>✨ Key Features:</h3>
+                        <ul style="margin-top: 15px;">
+                            <li>🧬 Interactive 3D molecular visualization</li>
+                            <li>📊 RMSD structural comparison</li>
+                            <li>🔍 Homology search and analysis</li>
+                            <li>⚡ Batch processing capabilities</li>
+                            <li>💻 Comprehensive CLI interface</li>
+                            <li>📈 Advanced evolutionary analysis</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                    <h4>📖 RMSD Interpretation Guide:</h4>
+                    <div class="grid grid-3 gap-15" style="margin-top: 15px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2em; color: #4caf50;">< 2.0 Å</div>
+                            <div><strong>Excellent</strong><br>Very similar structures</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2em; color: #ff9800;">2.0-4.0 Å</div>
+                            <div><strong>Good</strong><br>Some differences</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2em; color: #f44336;">> 4.0 Å</div>
+                            <div><strong>Poor</strong><br>Significant differences</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div id="help" class="content-section">
+                <h2>❓ Help & Support</h2>
+                
+                <div class="grid grid-2 gap-30">
+                    <div>
+                        <h3>🚀 Getting Started:</h3>
+                        <ol style="margin-top: 15px;">
+                            <li>Enter a UniProt ID (e.g., P01308) in the search box</li>
+                            <li>Click "🔍 Search" to start analysis</li>
+                            <li>Wait for structures to load</li>
+                            <li>Explore using different visualization styles</li>
+                            <li>Review RMSD results and comparison</li>
+                        </ol>
+                    </div>
+                    
+                    <div>
+                        <h3>⌨️ Keyboard Shortcuts:</h3>
+                        <ul style="margin-top: 15px;">
+                            <li><kbd>Ctrl/Cmd + K</kbd> - Focus search</li>
+                            <li><kbd>Escape</kbd> - Clear search</li>
+                            <li><kbd>Tab</kbd> - Navigate sections</li>
+                            <li><kbd>Enter</kbd> - Start analysis</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h3>🔧 Troubleshooting:</h3>
+                    <div class="grid grid-2 gap-20" style="margin-top: 15px;">
+                        <div>
+                            <h4>Structure not loading?</h4>
+                            <ul>
+                                <li>Check internet connection</li>
+                                <li>Verify UniProt ID is correct</li>
+                                <li>Try a different protein</li>
+                                <li>Refresh the page</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Server issues?</h4>
+                            <ul>
+                                <li>Restart the CLI server</li>
+                                <li>Check port 5001 availability</li>
+                                <li>Try a different port</li>
+                                <li>Check console for errors</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/site.js"></script>
+    
+    <!-- Main navigation script -->
+    <script>
+        function showSection(sectionId) {
+            console.log('🔧 showSection called with:', sectionId);
+            
+            // Hide all sections
+            const allSections = document.querySelectorAll('.content-section');
+            const allButtons = document.querySelectorAll('.feature-btn');
+            
+            console.log(`Found ${allSections.length} sections and ${allButtons.length} buttons`);
+            
+            allSections.forEach(s => {
+                s.classList.remove('active');
+                s.style.display = 'none';
+            });
+            allButtons.forEach(b => b.classList.remove('active'));
+            
+            // Show selected section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+                section.style.display = 'block';
+                section.style.visibility = 'visible';
+                section.style.opacity = '1';
+                console.log('✅ Section activated:', sectionId);
+            } else {
+                console.error('❌ Section not found:', sectionId);
+            }
+            
+            // Activate corresponding button
+            const buttons = document.querySelectorAll('.feature-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes('3D Viewer') && sectionId === 'visualization') {
+                    btn.classList.add('active');
+                    console.log('✅ 3D Viewer button activated');
+                }
+                if (btn.textContent.includes('CLI') && sectionId === 'cli') {
+                    btn.classList.add('active');
+                    console.log('✅ CLI button activated');
+                }
+                if (btn.textContent.includes('Docs') && sectionId === 'docs') {
+                    btn.classList.add('active');
+                    console.log('✅ Docs button activated');
+                }
+                if (btn.textContent.includes('Help') && sectionId === 'help') {
+                    btn.classList.add('active');
+                    console.log('✅ Help button activated');
+                }
+            });
+        }
+        
+        function copyCommand(element) {
+            const command = element.textContent;
+            navigator.clipboard.writeText(command).then(() => {
+                element.style.background = '#4ade80';
+                setTimeout(() => {
+                    element.style.background = '#2d3748';
+                }, 1000);
+            }).catch(() => {
+                console.log('Copy not supported');
+            });
+        }
+        
+        function debugShowAll() {
+            console.log('🔧 DEBUG: Force showing all content');
+            
+            // Add emergency class to body
+            document.body.classList.add('emergency-show');
+            
+            // Force show all main elements
+            const elements = [
+                '.main-content',
+                '.container', 
+                '.content-section',
+                '.header',
+                '.feature-nav'
+            ];
+            
+            elements.forEach(selector => {
+                const els = document.querySelectorAll(selector);
+                els.forEach(el => {
+                    el.style.display = 'block';
+                    el.style.visibility = 'visible';
+                    el.style.opacity = '1';
+                    el.style.position = 'relative';
+                    el.style.zIndex = '1';
+                });
+                console.log(`✅ Forced show for ${selector}: ${els.length} elements`);
+            });
+            
+            // Log current state
+            const visualization = document.getElementById('visualization');
+            const cli = document.getElementById('cli');
+            const docs = document.getElementById('docs');
+            const help = document.getElementById('help');
+            
+            console.log('Current section states:');
+            console.log('Visualization:', visualization ? visualization.style.display : 'NOT FOUND');
+            console.log('CLI:', cli ? cli.style.display : 'NOT FOUND');
+            console.log('Docs:', docs ? docs.style.display : 'NOT FOUND');
+            console.log('Help:', help ? help.style.display : 'NOT FOUND');
+            
+            alert('🔧 Debug mode activated! Check console for details. All content should now be visible.');
+        }
+        
+        // Initialize search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 DOM Content Loaded - Initializing interface...');
+            
+            // Force show the visualization section
+            const visualizationSection = document.getElementById('visualization');
+            if (visualizationSection) {
+                visualizationSection.classList.add('active');
+                visualizationSection.style.display = 'block';
+                console.log('✅ Visualization section activated');
+            } else {
+                console.error('❌ Visualization section not found');
+            }
+            
+            // Ensure container is visible
+            const container = document.querySelector('.container');
+            if (container) {
+                container.style.display = 'block';
+                container.style.visibility = 'visible';
+                container.style.opacity = '1';
+                console.log('✅ Main container made visible');
+            }
+            
+            // Ensure main content is visible
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.display = 'block';
+                mainContent.style.visibility = 'visible';
+                mainContent.style.opacity = '1';
+                console.log('✅ Main content made visible');
+            }
+            
+            // Check all content sections
+            const sections = document.querySelectorAll('.content-section');
+            console.log(`📊 Found ${sections.length} content sections`);
+            sections.forEach((section, index) => {
+                console.log(`Section ${index}: ${section.id} - Display: ${section.style.display}, Classes: ${section.className}`);
+            });
+            
+            const searchBtn = document.getElementById('searchBtn');
+            const searchInput = document.getElementById('proteinSearch');
+            
+            if (searchBtn && searchInput) {
+                console.log('✅ Search elements found and initializing...');
+                searchBtn.addEventListener('click', function() {
+                    const uniprotId = searchInput.value.trim().toUpperCase();
+                    console.log('🔍 Search clicked for:', uniprotId);
+                    if (uniprotId && window.proteinViewer) {
+                        window.proteinViewer.searchProtein(uniprotId);
+                    }
+                });
+                
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        console.log('⌨️ Enter pressed in search');
+                        searchBtn.click();
+                    }
+                });
+                
+                // Focus search with Ctrl/Cmd + K
+                document.addEventListener('keydown', function(e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        e.preventDefault();
+                        searchInput.focus();
+                        console.log('⌨️ Search focused with Ctrl+K');
+                    }
+                    
+                    if (e.key === 'Escape') {
+                        searchInput.value = '';
+                        searchInput.blur();
+                    }
+                });
+            } else {
+                console.error('❌ Search elements not found:', { searchBtn, searchInput });
+            }
+            
+            // Force show the default visualization section after a delay
+            setTimeout(() => {
+                showSection('visualization');
+                console.log('🔧 Forced visualization section to show');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

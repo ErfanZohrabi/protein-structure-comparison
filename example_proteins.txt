@@ -1,0 +1,9 @@
+# Example protein list for batch analysis
+# Format: UniProt_ID[tab]Name (optional)
+# Lines starting with # are comments
+
+P01308	Human Insulin
+P61626	Lysozyme
+P68871	Hemoglobin β
+P02768	Serum Albumin
+P04637	p53 Tumor Suppressor

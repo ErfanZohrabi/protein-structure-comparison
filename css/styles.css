@@ -1,0 +1,931 @@
+/**
+ * Protein Structure Viewer - Main Styles
+ * Enhanced PyMOL-style 3D protein visualization website
+ */
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --alphafold-color: #1e88e5;
+    --esmfold-color: #e53935;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --glass-backdrop: blur(10px);
+    --shadow-light: 0 2px 20px rgba(0,0,0,0.1);
+    --shadow-medium: 0 5px 25px rgba(0,0,0,0.15);
+    --shadow-heavy: 0 10px 40px rgba(0,0,0,0.2);
+    --border-radius: 15px;
+    --transition: all 0.3s ease;
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-mono: 'Courier New', 'Monaco', 'Menlo', monospace;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    margin-bottom: 0.5em;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+p {
+    margin-bottom: 1em;
+}
+
+/* Glass morphism utility classes */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-backdrop);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-light);
+}
+
+.glass-dark {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: var(--glass-backdrop);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Button styles */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: var(--bg-gradient);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Form elements */
+.form-input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid #e1e8ed;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: var(--transition);
+    background: white;
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Layout utilities */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.grid {
+    display: grid;
+    gap: 20px;
+}
+
+.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-auto {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.gap-10 { gap: 10px; }
+.gap-15 { gap: 15px; }
+.gap-20 { gap: 20px; }
+.gap-30 { gap: 30px; }
+
+/* Header styles */
+.header {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-backdrop);
+    padding: 20px 0;
+    box-shadow: var(--shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo h1 {
+    font-size: 2rem;
+    background: var(--bg-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.search-section {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 20px;
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Main content area */
+.main-content {
+    padding: 40px 0;
+    min-height: calc(100vh - 120px);
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure container is always visible */
+.container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative;
+}
+
+/* Debug styles for content sections */
+.content-section {
+    display: none;
+    padding: 30px;
+    min-height: 300px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    margin: 20px 0;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.content-section.active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    border-color: var(--primary-color);
+}
+
+/* Make header always visible */
+.header {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative;
+    z-index: 1000;
+}
+
+/* Ensure feature buttons are visible */
+.feature-nav {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.feature-btn {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Spacing utilities */
+/* Error and success messages */
+.error-message {
+    background: #ffe6e6;
+    color: #d32f2f;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 4px solid #d32f2f;
+    display: none;
+}
+
+.success-message {
+    background: #e8f5e8;
+    color: #2e7d32;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 4px solid #2e7d32;
+    display: none;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    display: none;
+}
+
+.loading-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #333;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Protein info section */
+.protein-info {
+    border-radius: var(--border-radius);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-medium);
+}
+
+.protein-header {
+    margin-bottom: 20px;
+}
+
+.protein-title h2 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    background: var(--bg-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.protein-meta {
+    margin-bottom: 20px;
+}
+
+.meta-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.meta-label {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.meta-value {
+    font-size: 1.1rem;
+    margin-top: 5px;
+    color: #333;
+}
+
+.function-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+}
+
+.function-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.sequence-display {
+    font-family: var(--font-mono);
+    background: #2d3748;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 10px;
+    line-height: 1.6;
+    word-break: break-all;
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* 3D Viewers */
+.viewers-container {
+    margin-bottom: 30px;
+}
+
+.viewer-section {
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: var(--shadow-medium);
+}
+
+.viewer-header {
+    margin-bottom: 20px;
+}
+
+.viewer-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.alphafold-title {
+    color: var(--alphafold-color);
+}
+
+.esmfold-title {
+    color: var(--esmfold-color);
+}
+
+.viewer-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.control-btn:hover {
+    background: #f0f0f0;
+    border-color: var(--primary-color);
+}
+
+.control-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.viewer {
+    width: 100%;
+    height: 500px;
+    border: 2px solid #e1e8ed;
+    border-radius: 15px;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+}
+
+.viewer-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    z-index: 10;
+}
+
+/* Comparison section */
+.comparison-section {
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--shadow-medium);
+    margin-bottom: 30px;
+}
+
+.rmsd-display {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.rmsd-value {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.rmsd-excellent { color: var(--success-color); }
+.rmsd-good { color: var(--warning-color); }
+.rmsd-poor { color: var(--error-color); }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .search-section {
+        max-width: 100%;
+        margin: 0;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .logo h1 {
+        font-size: 1.5rem;
+    }
+    
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    .viewers-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .protein-title h2 {
+        font-size: 2rem;
+    }
+    
+    .viewer {
+        height: 400px;
+    }
+    
+    .viewer-controls {
+        justify-content: center;
+    }
+    
+    .rmsd-value {
+        font-size: 2.5rem;
+    }
+    
+    .flex-between {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .viewer-header {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .main-content {
+        padding: 20px 0;
+    }
+    
+    .protein-info,
+    .viewer-section,
+    .comparison-section {
+        padding: 20px;
+    }
+    
+    .control-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .viewer {
+        height: 300px;
+    }
+    
+    .meta-item {
+        padding: 12px;
+    }
+    
+    .sequence-display {
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+}
+.mt-20 { margin-top: 20px; }
+.mt-30 { margin-top: 30px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-30 { margin-bottom: 30px; }
+
+.p-10 { padding: 10px; }
+.p-15 { padding: 15px; }
+.p-20 { padding: 20px; }
+.p-30 { padding: 30px; }
+
+/* Text utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-primary { color: var(--primary-color); }
+.text-secondary { color: var(--secondary-color); }
+.text-success { color: var(--success-color); }
+.text-warning { color: var(--warning-color); }
+.text-error { color: var(--error-color); }
+
+.text-gradient {
+    background: var(--bg-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Animation utilities */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.slide-up {
+    animation: slideUp 0.5s ease-out;
+}
+
+.bounce-in {
+    animation: bounceIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Loading animations */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-dots::after {
+    content: '';
+    animation: loadingDots 1.5s steps(4, end) infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes loadingDots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
+/* Molecular viewer specific styles */
+.molecular-viewer {
+    border: 2px solid #e1e8ed;
+    border-radius: var(--border-radius);
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    transition: var(--transition);
+}
+
+.molecular-viewer:hover {
+    box-shadow: var(--shadow-heavy);
+    transform: translateY(-2px);
+}
+
+.viewer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+}
+
+.viewer-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 20;
+}
+
+.viewer-control-btn {
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.viewer-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.viewer-control-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-online { background-color: var(--success-color); }
+.status-loading { background-color: var(--warning-color); animation: pulse 1s infinite; }
+.status-error { background-color: var(--error-color); }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.25rem; }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .grid-2,
+    .grid-3,
+    .grid-auto {
+        grid-template-columns: 1fr;
+    }
+    
+    .flex-between {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .form-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 8px;
+    }
+    
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.25rem; }
+    
+    .p-30 { padding: 15px; }
+    .p-20 { padding: 10px; }
+    
+    .molecular-viewer {
+        height: 300px;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .glass,
+    .glass-dark {
+        background: white;
+        backdrop-filter: none;
+        border: 1px solid #ccc;
+    }
+    
+    .molecular-viewer {
+        border: 2px solid #000;
+        background: white;
+    }
+    
+    .btn,
+    .viewer-controls,
+    .loading-overlay {
+        display: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #0000ff;
+        --secondary-color: #000080;
+        --bg-gradient: linear-gradient(135deg, #000080 0%, #000040 100%);
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .glass {
+        background: white;
+        border: 2px solid black;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .loading-spinner {
+        animation: none;
+        border-top-color: var(--primary-color);
+    }
+}
