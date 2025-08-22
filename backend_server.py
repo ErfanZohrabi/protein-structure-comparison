@@ -485,17 +485,22 @@ def main():
     print("   • /api/esmfold_predict - Structure prediction")
     print("   • /api/status - Server status")
     
-    port = int(os.environ.get('FLASK_PORT', 5001))
-    print(f"\n🚀 Starting server on http://localhost:{port}")
-    print(f"   Frontend available at: http://localhost:{port}")
-    print(f"   API base URL: http://localhost:{port}/api")
+    # Get port from environment (Render sets PORT, fallback to FLASK_PORT or 5001)
+    port = int(os.environ.get('PORT', os.environ.get('FLASK_PORT', 5001)))
+    
+    if os.environ.get('RENDER'):
+        print(f"\n🚀 Deploying on Render.com (port {port})")
+        print(f"   Frontend will be available at your Render domain")
+    else:
+        print(f"\n🚀 Starting server on http://localhost:{port}")
+        print(f"   Frontend available at: http://localhost:{port}")
+        print(f"   API base URL: http://localhost:{port}/api")
     
     # Start the server
-    port = int(os.environ.get('FLASK_PORT', 5001))
     app.run(
         host='0.0.0.0',
         port=port,
-        debug=True,
+        debug=False,  # Always False for production
         threaded=True
     )
 

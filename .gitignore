@@ -77,3 +77,8 @@ protein_analysis/batch_summary.json
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Deployment files (keep in git for Render)
+# render.yaml
+# Procfile
+# runtime.txt

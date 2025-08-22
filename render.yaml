@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: protein-structure-comparison
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python backend_server.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_PORT
+        value: 5001
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+    domains:
+      - protein-structure-comparison.onrender.com
