@@ -488,19 +488,24 @@ def main():
     # Get port from environment (Render sets PORT, fallback to FLASK_PORT or 5001)
     port = int(os.environ.get('PORT', os.environ.get('FLASK_PORT', 5001)))
     
+    # Check if running locally vs production
+    is_local = not os.environ.get('RENDER') and not os.environ.get('HEROKU')
+    debug_mode = is_local  # Enable debug mode for local development
+    
     if os.environ.get('RENDER'):
         print(f"\n🚀 Deploying on Render.com (port {port})")
         print(f"   Frontend will be available at your Render domain")
     else:
-        print(f"\n🚀 Starting server on http://localhost:{port}")
+        print(f"\n🚀 Starting LOCAL server on http://localhost:{port}")
         print(f"   Frontend available at: http://localhost:{port}")
         print(f"   API base URL: http://localhost:{port}/api")
+        print(f"   🔧 Debug mode: {'ENABLED' if debug_mode else 'DISABLED'}")
     
     # Start the server
     app.run(
         host='0.0.0.0',
         port=port,
-        debug=False,  # Always False for production
+        debug=debug_mode,  # Enable debug for local, disable for production
         threaded=True
     )
 
